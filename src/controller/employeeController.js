@@ -15,7 +15,29 @@ const EmployeeController = {
     },
 
     create: async (req, res) => {
-        const {nik, email, username, password, fullname, gender, birth_date, birth_place, phone, province, city, subdistrict, village, address, type, start_contract, end_contract, marriage_status, doctor_code_bpjs} = req.body;
+        const {
+            nik,
+            email,
+            username,
+            password,
+            name,
+            gender,
+            birth_date,
+            birth_place,
+            phone,
+            province,
+            city,
+            subdistrict,
+            village,
+            address,
+            type,
+            start_contract,
+            end_contract,
+            marriage_status,
+            doctor_code_bpjs
+        } = req.body;
+
+        const toNullIfEmpty = (val) => val === '' ? null : val;
 
         // lakukan pengecekan nik
         const checkNik = await employeeRepository.getById(nik);
@@ -23,15 +45,79 @@ const EmployeeController = {
             return res.status(409).json({message: 'NIK sudah digunakan'});
         }
 
-        const newEmp = await employeeRepository.create({ nik, email, username, password, fullname, gender, birth_date, birth_place, phone, province, city, subdistrict, village, address, type, start_contract, end_contract, marriage_status, doctor_code_bpjs });
+        const newEmp = await employeeRepository.create({
+            nik,
+            email,
+            username,
+            password,
+            name,
+            gender,
+            birth_date:  toNullIfEmpty(birth_date),
+            birth_place,
+            phone,
+            province,
+            city,
+            subdistrict,
+            village,
+            address,
+            type: Array.isArray(type) ? type : (type ? [type] : []),
+            start_contract: toNullIfEmpty(start_contract),
+            end_contract: toNullIfEmpty(end_contract),
+            marriage_status,
+            doctor_code_bpjs
+        });
 
         res.status(201).json(newEmp);
     },
 
     update: async (req, res) => {
-        const {email, username, password, name, gender, birth_date, birth_place, phone, province, city, subdistrict, village, address, type, start_contract, end_contract, marriage_status, doctor_code_bpjs} = req.body;
+        console.log(req);
+        
+        const {
+            email,
+            username,
+            password,
+            name,
+            gender,
+            birth_date,
+            birth_place,
+            phone,
+            province,
+            city,
+            subdistrict,
+            village,
+            address,
+            type,
+            start_contract,
+            end_contract,
+            marriage_status,
+            doctor_code_bpjs
+        } = req.body;
 
-        const updated = await employeeRepository.update(req.params.id, {email, username, password, name, gender, birth_date, birth_place, phone, province, city, subdistrict, village, address, type, start_contract, end_contract, marriage_status, doctor_code_bpjs});
+        const toNullIfEmptyOrStringNull = (val) => {
+            return val === '' || val === 'null' ? null : val;
+        };
+
+        const updated = await employeeRepository.update(req.params.id, {
+            email,
+            username,
+            password,
+            name,
+            gender,
+            birth_date:  toNullIfEmptyOrStringNull(birth_date),
+            birth_place,
+            phone,
+            province,
+            city,
+            subdistrict,
+            village,
+            address,
+            type: Array.isArray(type) ? type : (type ? [type] : []),
+            start_contract: toNullIfEmptyOrStringNull(start_contract),
+            end_contract: toNullIfEmptyOrStringNull(end_contract),
+            marriage_status,
+            doctor_code_bpjs
+        });
 
         res.json(updated);
     },
